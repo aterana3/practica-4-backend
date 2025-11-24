@@ -1,0 +1,228 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@authToken = your_jwt_token_here
+@taskId = task_id_here
+
+###############################################################################
+# SECURITY MODULE - AUTH
+###############################################################################
+
+### Register User
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "Test123456!",
+  "passwordConfirm": "Test123456!",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Login User
+POST {{baseUrl}}/security/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test123456!"
+}
+
+###############################################################################
+# SECURITY MODULE - USER
+###############################################################################
+
+### Update User
+POST {{baseUrl}}/security/user/update
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "username": "updateduser",
+  "firstName": "Updated",
+  "lastName": "Name",
+  "email": "updated@example.com",
+  "verifyPassword": "Test123456!"
+}
+
+###############################################################################
+# SECURITY MODULE - GOOGLE OAUTH
+###############################################################################
+
+### Google OAuth - Initiate (Open in browser)
+# GET {{baseUrl}}/security/auth/google
+# Note: This should be opened in a browser, not tested via HTTP client
+
+### Google OAuth - Callback (Handled by Google)
+# GET {{baseUrl}}/security/auth/google/callback
+# Note: This is called by Google after authentication
+
+### Google OAuth - Failure
+GET {{baseUrl}}/security/auth/google/failure
+
+###############################################################################
+# TASKS MODULE
+###############################################################################
+
+### Create Task
+POST {{baseUrl}}/task/tasks
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "My First Task",
+  "description": "This is a test task",
+  "status": "pending",
+  "priority": "high"
+}
+
+### Get All Tasks
+GET {{baseUrl}}/task/tasks
+Authorization: Bearer {{authToken}}
+
+### Get Task by ID
+GET {{baseUrl}}/task/tasks/{{taskId}}
+Authorization: Bearer {{authToken}}
+
+### Update Task
+PUT {{baseUrl}}/task/tasks/{{taskId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "Updated Task Title",
+  "description": "Updated description",
+  "status": "completed",
+  "priority": "medium"
+}
+
+### Delete Task
+DELETE {{baseUrl}}/task/tasks/{{taskId}}
+Authorization: Bearer {{authToken}}
+
+###############################################################################
+# TESTING WORKFLOW
+###############################################################################
+
+# 1. Register a new user (Register User)
+# 2. Login with the user credentials (Login User)
+# 3. Copy the JWT token from the login response
+# 4. Replace {{authToken}} variable at the top with the actual token
+# 5. Create a task (Create Task)
+# 6. Copy the task ID from the response
+# 7. Replace {{taskId}} variable at the top with the actual task ID
+# 8. Test other endpoints (Get All Tasks, Get Task by ID, Update Task, Delete Task)
+
+###############################################################################
+# ADDITIONAL TEST CASES
+###############################################################################
+
+### Register User - Invalid Email
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "invalid-email",
+  "password": "Test123456!",
+  "passwordConfirm": "Test123456!",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Login User - Wrong Password
+POST {{baseUrl}}/security/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "WrongPassword123!"
+}
+
+### Get Tasks - Without Authentication
+GET {{baseUrl}}/task/tasks
+
+### Create Task - Invalid Data
+POST {{baseUrl}}/task/tasks
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": ""
+}
+
+### Update Task - Non-existent ID
+PUT {{baseUrl}}/task/tasks/999999
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "Updated Task"
+}
+
+### Delete Task - Non-existent ID
+DELETE {{baseUrl}}/task/tasks/999999
+Authorization: Bearer {{authToken}}
+
+###############################################################################
+# EDGE CASES
+###############################################################################
+
+### Register User - Password Mismatch
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "email": "test2@example.com",
+  "password": "Test123456!",
+  "passwordConfirm": "DifferentPassword!",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Register User - Duplicate Email
+# First run "Register User" above, then run this
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser3",
+  "email": "test@example.com",
+  "password": "Test123456!",
+  "passwordConfirm": "Test123456!",
+  "firstName": "Another",
+  "lastName": "User"
+}
+
+### Register User - Short Password
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser4",
+  "email": "test4@example.com",
+  "password": "short",
+  "passwordConfirm": "short",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Register User - Missing Fields
+POST {{baseUrl}}/security/auth/register
+Content-Type: application/json
+
+{
+  "email": "test5@example.com",
+  "password": "Test123456!"
+}
+
+### Login User - Non-existent User
+POST {{baseUrl}}/security/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "Test123456!"
+}
